@@ -47,13 +47,41 @@ def get_data_loaders(
     # appropriate transforms for that step
     data_transforms = {
         "train": transforms.Compose(
+            [
+             transforms.Resize(256),
+             transforms.RandomResizedCrop(224),
+            transforms.OneOf(
+            [
+                transforms.OpticalDistortion(p=0.3),
+                transforms.GridDistortion(p=0.1),
+                transforms.PiecewiseAffine(p=0.3),
+            ],
+            p=0.3,
+            ),
+            transforms.OneOf(
+            [
+                transforms.HueSaturationValue(10, 15, 10),
+                transforms.CLAHE(clip_limit=2),
+                transforms.RandomBrightnessContrast(),
+            ],
+            p=0.3,
+            ),
+             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+             transforms.ToTensor() 
+             ]
             # YOUR CODE HERE
         ),
         "valid": transforms.Compose(
-            # YOUR CODE HERE
+            [transforms.ToTensor(), 
+             transforms.Resize(256),
+             transforms.RandomResizedCrop(224),
+             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
         ),
         "test": transforms.Compose(
-            # YOUR CODE HERE
+            [transforms.ToTensor(), 
+             transforms.Resize(256),
+             transforms.RandomResizedCrop(224),
+             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
         ),
     }
 
@@ -62,6 +90,7 @@ def get_data_loaders(
         base_path / "train",
         # YOUR CODE HERE: add the appropriate transform that you defined in
         # the data_transforms dictionary
+        train=True, transform=data_transforms["train"]
     )
     # The validation dataset is a split from the train_one_epoch dataset, so we read
     # from the same folder, but we apply the transforms for validation
@@ -69,6 +98,7 @@ def get_data_loaders(
         base_path / "train",
         # YOUR CODE HERE: add the appropriate transform that you defined in
         # the data_transforms dictionary
+        train=False, transform=data_transforms["valid"]
     )
 
     # obtain training indices that will be used for validation
@@ -85,7 +115,7 @@ def get_data_loaders(
 
     # define samplers for obtaining training and validation batches
     train_sampler = torch.utils.data.SubsetRandomSampler(train_idx)
-    valid_sampler  = # YOUR CODE HERE
+    valid_sampler  = torch.utils.data.SubsetRandomSampler(valid_idx)# YOUR CODE HERE
 
     # prepare data loaders
     data_loaders["train"] = torch.utils.data.DataLoader(
@@ -96,12 +126,17 @@ def get_data_loaders(
     )
     data_loaders["valid"] = torch.utils.data.DataLoader(
         # YOUR CODE HERE
+        valid_data,
+        batch_size=batch_size,
+        sampler=train_sampler,
+        num_workers=num_workers,
     )
 
     # Now create the test data loader
     test_data = datasets.ImageFolder(
         base_path / "test",
         # YOUR CODE HERE (add the test transform)
+        train=False, transform=data_transforms["test"]
     )
 
     if limit > 0:
@@ -112,6 +147,10 @@ def get_data_loaders(
 
     data_loaders["test"] = torch.utils.data.DataLoader(
         # YOUR CODE HERE (remember to add shuffle=False as well)
+        test_data,
+        batch_size=batch_size,
+        sampler=train_sampler,
+        num_workers=num_workers,
     )
 
     return data_loaders
