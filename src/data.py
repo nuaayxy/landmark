@@ -48,40 +48,29 @@ def get_data_loaders(
     data_transforms = {
         "train": transforms.Compose(
             [
+             transforms.ToTensor(),
              transforms.Resize(256),
              transforms.RandomResizedCrop(224),
-            transforms.OneOf(
-            [
-                transforms.OpticalDistortion(p=0.3),
-                transforms.GridDistortion(p=0.1),
-                transforms.PiecewiseAffine(p=0.3),
-            ],
-            p=0.3,
-            ),
-            transforms.OneOf(
-            [
-                transforms.HueSaturationValue(10, 15, 10),
-                transforms.CLAHE(clip_limit=2),
-                transforms.RandomBrightnessContrast(),
-            ],
-            p=0.3,
-            ),
              transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-             transforms.ToTensor() 
-             ]
+             
+            ]
             # YOUR CODE HERE
         ),
         "valid": transforms.Compose(
-            [transforms.ToTensor(), 
+            [ 
+             transforms.ToTensor(),
              transforms.Resize(256),
              transforms.RandomResizedCrop(224),
-             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
+             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+             ]
         ),
         "test": transforms.Compose(
-            [transforms.ToTensor(), 
+            [ 
+             transforms.ToTensor(),
              transforms.Resize(256),
              transforms.RandomResizedCrop(224),
-             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
+             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+             ]
         ),
     }
 
@@ -90,7 +79,7 @@ def get_data_loaders(
         base_path / "train",
         # YOUR CODE HERE: add the appropriate transform that you defined in
         # the data_transforms dictionary
-        train=True, transform=data_transforms["train"]
+        transform=data_transforms["train"]
     )
     # The validation dataset is a split from the train_one_epoch dataset, so we read
     # from the same folder, but we apply the transforms for validation
@@ -98,7 +87,7 @@ def get_data_loaders(
         base_path / "train",
         # YOUR CODE HERE: add the appropriate transform that you defined in
         # the data_transforms dictionary
-        train=False, transform=data_transforms["valid"]
+        transform=data_transforms["valid"]
     )
 
     # obtain training indices that will be used for validation
@@ -136,7 +125,7 @@ def get_data_loaders(
     test_data = datasets.ImageFolder(
         base_path / "test",
         # YOUR CODE HERE (add the test transform)
-        train=False, transform=data_transforms["test"]
+        transform=data_transforms["test"]
     )
 
     if limit > 0:
@@ -168,10 +157,10 @@ def visualize_one_batch(data_loaders, max_n: int = 5):
     # YOUR CODE HERE:
     # obtain one batch of training images
     # First obtain an iterator from the train dataloader
-    dataiter  = # YOUR CODE HERE
+    dataiter  = iter(data_loaders["train"])# YOUR CODE HERE
     # Then call the .next() method on the iterator you just
     # obtained
-    images, labels  = # YOUR CODE HERE
+    images, labels  = next(dataiter)# YOUR CODE HERE
 
     # Undo the normalization (for visualization purposes)
     mean, std = compute_mean_and_std()
@@ -186,7 +175,9 @@ def visualize_one_batch(data_loaders, max_n: int = 5):
 
     # YOUR CODE HERE:
     # Get class names from the train data loader
-    class_names  = # YOUR CODE HERE
+    class_names  = data_loaders["train"].dataset.classes # YOUR CODE HERE
+    print(len(class_names))
+    print("this is called")
 
     # Convert from BGR (the format used by pytorch) to
     # RGB (the format expected by matplotlib)
@@ -221,7 +212,7 @@ def test_data_loaders_keys(data_loaders):
 def test_data_loaders_output_type(data_loaders):
     # Test the data loaders
     dataiter = iter(data_loaders["train"])
-    images, labels = dataiter.next()
+    images, labels = next(dataiter)
 
     assert isinstance(images, torch.Tensor), "images should be a Tensor"
     assert isinstance(labels, torch.Tensor), "labels should be a Tensor"
@@ -231,7 +222,7 @@ def test_data_loaders_output_type(data_loaders):
 
 def test_data_loaders_output_shape(data_loaders):
     dataiter = iter(data_loaders["train"])
-    images, labels = dataiter.next()
+    images, labels = next(dataiter)
 
     assert len(images) == 2, f"Expected a batch of size 2, got size {len(images)}"
     assert (
