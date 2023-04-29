@@ -14,11 +14,30 @@ class MyModel(nn.Module):
     def __init__(self, num_classes: int = 1000, dropout: float = 0.7) -> None:
 
         super().__init__()
-        self.conv1 = nn.Conv2d(1, 10, kernel_size = 5)
-        self.conv2 = nn.Conv2d(10, 20, kernel_size = 5)
-        self.conv2_drop  = nn.Dropout2d()
-        self.fc1 = nn.Linear(320, 50)
-        self.fc2 = nn.Linear(50, 23)
+        #image size is 224*224
+        self.model = nn.Sequential(
+            nn.Conv2d(in_channels=3, out_channels=16, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2, 2),
+            nn.Conv2d(16, 32, 3, padding=1),  # -> 32x112x112
+            nn.ReLU(),
+            nn.MaxPool2d(2, 2),  # -> 32x8x8
+            nn.Conv2d(32, 64, 3, padding=1),  # -> 64x56x56
+            nn.ReLU(),
+            nn.MaxPool2d(2, 2),  # -> 64x4x4
+            nn.Conv2d(64, 128, 3, padding=1),  # -> 128x28x28
+            nn.ReLU(),
+            nn.MaxPool2d(2, 2),  # -> 64x14x14
+            nn.Conv2d(128, 256, 3, padding=1),  # -> 256x14x14
+            nn.ReLU(),
+            nn.MaxPool2d(2, 2),  # -> 256x7x7
+            nn.Flatten(),  
+            nn.Linear(256 * 7* 7, 500),  # -> 500
+            nn.Dropout(0.5),
+            nn.ReLU(),
+            nn.Linear(500, num_classes),
+            nn.Softmax()
+        )
 
         # YOUR CODE HERE
         # Define a CNN architecture. Remember to use the variable num_classes
@@ -27,13 +46,7 @@ class MyModel(nn.Module):
         # to use (like nn.Dropout(p=dropout))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = F.relu(F.max_pool2d(self.conv1(x), 2))
-        x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
-        x = x.view(-1, 320)
-        x = F.relu(self.fc1(x))
-        x = F.dropout(x, training = self.training)
-        x = self.fc2(x)
-        return F.log_softmax(x)
+        return self.model(x)
         # YOUR CODE HERE: process the input tensor through the
         # feature extractor, the pooling and the final linear
         # layers (if appropriate for the architecture chosen)

@@ -176,8 +176,7 @@ def visualize_one_batch(data_loaders, max_n: int = 5):
     # YOUR CODE HERE:
     # Get class names from the train data loader
     class_names  = data_loaders["train"].dataset.classes # YOUR CODE HERE
-    print(len(class_names))
-    print("this is called")
+
 
     # Convert from BGR (the format used by pytorch) to
     # RGB (the format expected by matplotlib)
@@ -191,6 +190,7 @@ def visualize_one_batch(data_loaders, max_n: int = 5):
         # print out the correct label for each image
         # .item() gets the value contained in a Tensor
         ax.set_title(class_names[labels[idx].item()])
+        # ax.set_title(len(class_names))
 
 
 ######################################################################################
