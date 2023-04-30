@@ -36,7 +36,7 @@ class MyModel(nn.Module):
             nn.Dropout(0.5),
             nn.ReLU(),
             nn.Linear(500, num_classes),
-            nn.Softmax()
+            # nn.Softmax()
         )
 
         # YOUR CODE HERE
