@@ -4,6 +4,7 @@ import torch.utils.data
 from pathlib import Path
 from torchvision import datasets, transforms
 import multiprocessing
+from torchvision import transforms as T
 
 from .helpers import compute_mean_and_std, get_data_location
 import matplotlib.pyplot as plt
@@ -50,6 +51,12 @@ def get_data_loaders(
             [
              transforms.Resize(256),
              transforms.RandomResizedCrop(224),
+             transforms.RandomHorizontalFlip(0.5),
+             # T.RandAugment(
+             #        num_ops=2,
+             #        magnitude=9,
+             #        interpolation=T.InterpolationMode.BILINEAR,
+             # ),
              transforms.ToTensor(),
              transforms.Normalize(mean, std),
              
