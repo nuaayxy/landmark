@@ -33,7 +33,7 @@ class MyModel(nn.Module):
             nn.MaxPool2d(2, 2),  # -> 256x7x7
             nn.Flatten(),  
             nn.Linear(256 * 7* 7, 500),  # -> 500
-            nn.Dropout(0.5),
+            nn.Dropout(dropout),
             nn.ReLU(),
             nn.Linear(500, num_classes),
             # nn.Softmax()

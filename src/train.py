@@ -135,7 +135,7 @@ def optimize(data_loaders, model, optimizer, loss, n_epochs, save_path, interact
 
             # Save the weights to save_path
             # YOUR CODE HERE
-            torch.save(model.state_dict(), 'checkpoint.pth')
+            torch.save(model.state_dict(), save_path)
 
             valid_loss_min = valid_loss
 
@@ -191,7 +191,7 @@ def one_epoch_test(test_dataloader, model, loss):
             # convert logits to predicted class
             # HINT: the predicted class is the index of the max of the logits
              # _, pred  = torch.max(logits.data, 1)# YOUR CODE HERE
-            pred = torch.max(logits.data, 1)
+            _,pred = torch.max(logits.data, 1)
 
             # compare predictions to true label
             correct += torch.sum(torch.squeeze(pred.eq(target.data.view_as(pred))).cpu())

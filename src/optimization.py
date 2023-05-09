@@ -11,9 +11,9 @@ def get_loss():
     # criterion = nn.NLLLoss()
 
     # YOUR CODE HERE: select a loss appropriate for classification
-    loss  = nn.NLLLoss()# YOUR CODE HERE
+    # loss  = nn.NLLLoss()# YOUR CODE HERE
     # specify loss function (categorical cross-entropy)
-
+    loss = nn.CrossEntropyLoss()
     return loss
 
 

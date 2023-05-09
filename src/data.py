@@ -48,29 +48,29 @@ def get_data_loaders(
     data_transforms = {
         "train": transforms.Compose(
             [
-             transforms.ToTensor(),
              transforms.Resize(256),
              transforms.RandomResizedCrop(224),
-             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+             transforms.ToTensor(),
+             transforms.Normalize(mean, std),
              
             ]
             # YOUR CODE HERE
         ),
         "valid": transforms.Compose(
             [ 
-             transforms.ToTensor(),
              transforms.Resize(256),
-             transforms.RandomResizedCrop(224),
-             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-             ]
+             transforms.CenterCrop(224),
+             transforms.ToTensor(),
+             transforms.Normalize(mean, std),
+            ]
         ),
         "test": transforms.Compose(
             [ 
-             transforms.ToTensor(),
              transforms.Resize(256),
-             transforms.RandomResizedCrop(224),
-             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-             ]
+             transforms.CenterCrop(224),
+             transforms.ToTensor(),
+             transforms.Normalize(mean, std)
+            ]
         ),
     }
 
@@ -136,10 +136,7 @@ def get_data_loaders(
 
     data_loaders["test"] = torch.utils.data.DataLoader(
         # YOUR CODE HERE (remember to add shuffle=False as well)
-        test_data,
-        batch_size=batch_size,
-        sampler=train_sampler,
-        num_workers=num_workers,
+        test_data
     )
 
     return data_loaders
